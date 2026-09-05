@@ -71,10 +71,6 @@ export default function MealDetailScreen({ route, navigation }) {
             <List data={selectedMeal.ingredients} />
           </View>
 
-          <View style={styles.card}>
-            <Subtitle>ขั้นตอนการทำ</Subtitle>
-            <List data={selectedMeal.steps} />
-          </View>
         </View>
       </ScrollView>
 
