@@ -6,8 +6,10 @@ import {
   FlatList,
   TextInput,
   Pressable,
-  SafeAreaView,
+  Dimensions,
 } from 'react-native';
+import { SafeAreaView, } from 'react-native-safe-area-context';
+
 import { Ionicons } from '@expo/vector-icons';
 
 import Colors from '../constants/colors';
@@ -15,6 +17,17 @@ import { CATEGORIES, MEALS } from '../data/meal-data';
 import MenuCard from '../components/MenuCard';
 import { AuthContext } from '../store/context/auth-context';
 import { CartContext } from '../store/context/cart-context';
+
+// Fixed card size — 2 columns, regardless of item count (prevents the last
+// odd-numbered card in a row from stretching to fill the whole row).
+const NUM_COLUMNS = 2;
+const GRID_PADDING = 12; // matches styles.grid.paddingHorizontal
+const { width: SCREEN_WIDTH } = Dimensions.get('window');
+const CARD_WIDTH = (SCREEN_WIDTH - GRID_PADDING * 2) / NUM_COLUMNS;
+
+// Fixed size for every category chip (regardless of label length)
+const CHIP_WIDTH = 96;
+const CHIP_HEIGHT = 40;
 
 export default function HomeScreen({ navigation }) {
   const { profile } = useContext(AuthContext);
@@ -68,6 +81,7 @@ export default function HomeScreen({ navigation }) {
 
       <FlatList
         horizontal
+        style={{ flexGrow: 0 }}
         showsHorizontalScrollIndicator={false}
         data={[{ id: null, title: 'ทั้งหมด' }, ...CATEGORIES]}
         keyExtractor={(item) => item.id ?? 'all'}
@@ -79,7 +93,11 @@ export default function HomeScreen({ navigation }) {
               onPress={() => setSelectedCategory(item.id)}
               style={[styles.chip, isActive && styles.chipActive]}
             >
-              <Text style={[styles.chipText, isActive && styles.chipTextActive]}>
+              <Text
+                style={[styles.chipText, isActive && styles.chipTextActive]}
+                numberOfLines={1}
+                ellipsizeMode="tail"
+              >
                 {item.title}
               </Text>
             </Pressable>
@@ -88,18 +106,21 @@ export default function HomeScreen({ navigation }) {
       />
 
       <FlatList
+        style={{ flex: 1 }}
         data={filteredMeals}
         keyExtractor={(item) => item.id}
-        numColumns={2}
+        numColumns={NUM_COLUMNS}
         contentContainerStyle={styles.grid}
         renderItem={({ item }) => (
-          <MenuCard
-            id={item.id}
-            title={item.title}
-            imageUrl={item.imageUrl}
-            price={item.price}
-            duration={item.duration}
-          />
+          <View style={styles.cardWrapper}>
+            <MenuCard
+              id={item.id}
+              title={item.title}
+              imageUrl={item.imageUrl}
+              price={item.price}
+              duration={item.duration}
+            />
+          </View>
         )}
         ListEmptyComponent={
           <View style={styles.emptyBox}>
@@ -182,15 +203,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingVertical: 16,
     gap: 8,
+    alignItems: 'center',
   },
   chip: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
+    width: CHIP_WIDTH,
+    height: CHIP_HEIGHT,
     borderRadius: 20,
     backgroundColor: Colors.surface,
     borderWidth: 1,
     borderColor: Colors.border,
     marginRight: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 8,
   },
   chipActive: {
     backgroundColor: Colors.primary600,
@@ -200,13 +225,17 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: Colors.text700,
+    textAlign: 'center',
   },
   chipTextActive: {
     color: Colors.white,
   },
   grid: {
-    paddingHorizontal: 12,
+    paddingHorizontal: GRID_PADDING,
     paddingBottom: 24,
+  },
+  cardWrapper: {
+    width: CARD_WIDTH,
   },
   emptyBox: {
     alignItems: 'center',
