@@ -3,18 +3,21 @@ import { View, Text, Image, ScrollView, StyleSheet, Pressable } from 'react-nati
 import { Ionicons } from '@expo/vector-icons';
 
 import Colors from '../constants/colors';
-import { MEALS } from '../data/meal-data';
+import { meals } from '../data/meal-data';
 import Subtitle from '../components/MealDetail/Subtitle';
 import List from '../components/MealDetail/List';
 import { FavoritesContext } from '../store/context/favorite-context';
 import { CartContext } from '../store/context/cart-context';
+import { MealsContext } from '../store/context/meal-context';
 import PrimaryButton from '../components/UI/PrimaryButton';
 
 export default function MealDetailScreen({ route, navigation }) {
+    const { meals, categories, loading, refreshData } = useContext(MealsContext);
+  
   const favoritesCtx = useContext(FavoritesContext);
   const cartCtx = useContext(CartContext);
   const mealId = route.params.mealId;
-  const selectedMeal = MEALS.find((meal) => meal.id === mealId);
+  const selectedMeal = meals.find((meal) => meal.id === mealId);
   const isFavorite = favoritesCtx.ids.includes(mealId);
   const [quantity, setQuantity] = useState(1);
 

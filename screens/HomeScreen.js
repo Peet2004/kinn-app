@@ -1,4 +1,4 @@
-import { useContext, useMemo, useState } from 'react';
+import { useContext, useEffect, useMemo, useState } from 'react';
 import {
   View,
   Text,
@@ -7,8 +7,11 @@ import {
   TextInput,
   Pressable,
   Dimensions,
+  ActivityIndicator
 } from 'react-native';
 import { SafeAreaView, } from 'react-native-safe-area-context';
+
+import { MealsContext } from '../store/context/meal-context'
 
 import { Ionicons } from '@expo/vector-icons';
 
@@ -17,6 +20,8 @@ import { CATEGORIES, MEALS } from '../data/meal-data';
 import MenuCard from '../components/MenuCard';
 import { AuthContext } from '../store/context/auth-context';
 import { CartContext } from '../store/context/cart-context';
+
+
 
 // Fixed card size — 2 columns, regardless of item count (prevents the last
 // odd-numbered card in a row from stretching to fill the whole row).
@@ -30,13 +35,15 @@ const CHIP_WIDTH = 96;
 const CHIP_HEIGHT = 40;
 
 export default function HomeScreen({ navigation }) {
+
+  const { meals, categories, loading, refreshData } = useContext(MealsContext);
   const { profile } = useContext(AuthContext);
   const cartCtx = useContext(CartContext);
   const [selectedCategory, setSelectedCategory] = useState(null);
   const [search, setSearch] = useState('');
 
   const filteredMeals = useMemo(() => {
-    return MEALS.filter((meal) => {
+    return meals.filter((meal) => {
       const matchesCategory = selectedCategory
         ? meal.categoryIds.includes(selectedCategory)
         : true;
@@ -46,6 +53,14 @@ export default function HomeScreen({ navigation }) {
   }, [selectedCategory, search]);
 
   const firstName = profile?.name?.split(' ')[0] || 'ผู้ใช้งาน';
+
+  // if (loading) {
+  // return <ActivityIndicator size="large" color={Colors.primary600} />;
+  // }
+  useEffect(() => {
+  console.log("ทำงานครั้งเดียวตอนเปิดแอปหรือเปิดหน้านี้");
+  refreshData; // ฟังก์ชันดึงข้อมูล
+}, []);
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -83,7 +98,7 @@ export default function HomeScreen({ navigation }) {
         horizontal
         style={{ flexGrow: 0 }}
         showsHorizontalScrollIndicator={false}
-        data={[{ id: null, title: 'ทั้งหมด' }, ...CATEGORIES]}
+        data={[{ id: null, title: 'ทั้งหมด' }, ...categories]}
         keyExtractor={(item) => item.id ?? 'all'}
         contentContainerStyle={styles.chipsRow}
         renderItem={({ item }) => {

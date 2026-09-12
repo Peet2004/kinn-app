@@ -7,10 +7,13 @@ import Colors from '../constants/colors';
 import { MEALS } from '../data/meal-data';
 import { FavoritesContext } from '../store/context/favorite-context';
 import MenuCard from '../components/MenuCard';
+import { MealsContext } from '../store/context/meal-context';
 
 export default function FavoritesScreen() {
+    const { meals } = useContext(MealsContext);
+  
   const favoritesCtx = useContext(FavoritesContext);
-  const favoriteMeals = MEALS.filter((meal) => favoritesCtx.ids.includes(meal.id));
+  const favoriteMeals = meals.filter((meal) => favoritesCtx.ids.includes(meal.id));
 
   return (
     <SafeAreaView style={styles.safeArea}>

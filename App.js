@@ -25,6 +25,7 @@ import AuthContextProvider, { AuthContext } from './store/context/auth-context';
 import CartContextProvider from './store/context/cart-context';
 import FavoritesContextProvider from './store/context/favorite-context';
 import OrderContextProvider from './store/context/order-context';
+import { MealsContextProvider }  from './store/context/meal-context';
 
 const Stack = createNativeStackNavigator();
 const AuthStack = createNativeStackNavigator();
@@ -39,6 +40,7 @@ const screenOptions = {
 
 function AuthNavigator() {
   return (
+    
     <AuthStack.Navigator screenOptions={{ headerShown: false }}>
       <AuthStack.Screen name="Login" component={LoginScreen} />
       <AuthStack.Screen name="Register" component={RegisterScreen} />
@@ -149,13 +151,15 @@ function Root() {
   return (
     <NavigationContainer>
       {isAuthenticated ? (
-        <FavoritesContextProvider>
-          <CartContextProvider>
-            <OrderContextProvider>
-              <AppNavigator />
-            </OrderContextProvider>
-          </CartContextProvider>
-        </FavoritesContextProvider>
+        <MealsContextProvider>
+          <FavoritesContextProvider>
+            <CartContextProvider>
+              <OrderContextProvider>
+                <AppNavigator />
+              </OrderContextProvider>
+            </CartContextProvider>
+          </FavoritesContextProvider>
+        </MealsContextProvider>
       ) : (
         <AuthNavigator />
       )}
